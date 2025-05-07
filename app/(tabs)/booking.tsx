@@ -1,11 +1,36 @@
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
-import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
+import React, { useEffect, useState } from 'react';
 import TripCard from '@/components/TripCard';
+import useTripAPI from '@/apiHook/useTripAPI';
+import { useAuthStore } from '@/store/authStore';
 
 export default function Booking() {
-  const [selectedStatus, setSelectedStatus] = useState('Pending'); // Default selected status
+  const { getAllTripsWithFilters } = useTripAPI();
+  const { user } = useAuthStore();
 
   const statuses = ['Pending', 'Ongoing', 'Completed', 'Cancelled'];
+  const [selectedStatus, setSelectedStatus] = useState('Pending');
+  const [trips, setTrips] = useState();
+  const [loading, setLoading] = useState(false);
+
+  const fetchTrips = async () => {
+    if (!user?._id) return;
+    setLoading(true);
+    const response = await getAllTripsWithFilters({
+      vendorId: user._id,
+      tripStatus: selectedStatus.toLocaleLowerCase(),
+    });
+    
+
+    if (response?.success) {
+      setTrips(response.trips);
+    }
+    setLoading(false);
+  };
+  
+  useEffect(() => {
+    fetchTrips();
+  }, [selectedStatus]);
 
   return (
     <>
@@ -20,8 +45,8 @@ export default function Booking() {
               <TouchableOpacity
                 key={status}
                 className={`border-2 flex items-center justify-center px-2 py-1 rounded-[2rem] ${selectedStatus === status
-                    ? 'bg-cyan-100 border-cyan-700' // Selected (Cyan)
-                    : 'bg-white border-neutral-300' // Not selected (Gray)
+                  ? 'bg-cyan-100 border-cyan-700'
+                  : 'bg-white border-neutral-300'
                   }`}
                 onPress={() => setSelectedStatus(status)}
               >
@@ -36,18 +61,35 @@ export default function Booking() {
           </View>
         </View>
       </View>
-      <ScrollView
-        className='p-2 flex-1 gap-2'
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ flexGrow: 1, alignItems: 'center' }}
-      >
-        <View className='flex-1 gap-2 w-full'>
-          <TripCard pickupLocation={'something'} dropoffLocation={'manali'} duration={'4 Days'} fare={24000} commission={1000} carType={"sedan"} carName={'M5 cs'} additional='something something' pickupDate={new Date()} pickupTime={new Date()} />
-          <TripCard pickupLocation={'something'} dropoffLocation={'manali'} duration={'4 Days'} fare={24000} commission={1000} carType={"sedan"} carName={'M5 cs'} additional='something something' pickupDate={new Date()} pickupTime={new Date()} />
-          <TripCard pickupLocation={'something'} dropoffLocation={'manali'} duration={'4 Days'} fare={24000} commission={1000} carType={"sedan"} carName={'M5 cs'} additional='something something' pickupDate={new Date()} pickupTime={new Date()} />
-          <TripCard pickupLocation={'something'} dropoffLocation={'manali'} duration={'4 Days'} fare={24000} commission={1000} carType={"sedan"} carName={'M5 cs'} additional='something something' pickupDate={new Date()} pickupTime={new Date()} />
-        </View>
-      </ScrollView>
+
+      {loading ? (
+        <ActivityIndicator size="large" className="mt-10" />
+      ) : (
+        <FlatList
+          data={trips}
+          keyExtractor={(_, index) => index.toString()}
+          contentContainerStyle={{ padding: 4 }}
+          renderItem={({ item }) => (
+            <TripCard
+              pickupLocation={item.pickupLocation}
+              dropoffLocation={item.dropoffLocation}
+              pickupDate={new Date(item.pickupDate)}
+              pickupTime={new Date(item.pickupTime)}
+              duration={item.duration}
+              fare={item.fare}
+              status={item.status}
+              tripType={item.tripType}
+              commission={item.commission}
+              carType={item.carType}
+              carName={item.carName}
+              additional={item.additional}
+            />
+          )}
+          ListEmptyComponent={
+            <Text className="text-center mt-10 text-gray-500">No trips found.</Text>
+          }
+        />
+      )}
     </>
   );
 }

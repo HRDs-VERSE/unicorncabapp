@@ -10,6 +10,8 @@ interface RideDetailsProps {
   pickupTime?: Date
   duration: string
   fare: number
+  status: string
+  tripType: string
   commission: number
   carType: "sedan" | "suv" | "mpv" | "luxury" | "luxury suv" | "traveller"
   carName: string
@@ -25,27 +27,30 @@ export default function TripCard({
   fare,
   commission,
   carType,
+  status,
+  tripType,
   carName,
   additional,
 }: RideDetailsProps) {
-  // Format date if provided
-  const formattedDate = pickupDate
-    ? pickupDate.toLocaleDateString("en-US", {
-      // weekday: "short",
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    })
-    : "Not specified"
 
-  // Format time if provided
-  const formattedTime = pickupTime
-    ? pickupTime.toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "numeric",
-      hour12: true,
-    })
-    : "Not specified"
+  // Format date if provided
+  const formattedDate =
+    pickupDate
+      ? new Date(pickupDate).toLocaleDateString("en-US", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      })
+      : "Not specified";
+
+  const formattedTime =
+    pickupTime
+      ? new Date(pickupTime).toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "numeric",
+        hour12: true,
+      })
+      : "Not specified";
 
   // Get appropriate car icon based on car type
   const getCarTypeIcon = () => {
@@ -74,76 +79,76 @@ export default function TripCard({
 
   return (
     <>
-     <View className="mx-4 my-3 shadow-md rounded-[8px] p-3 bg-white">
-  <View className="gap-3">
+      <View className="mb-4 my-3 shadow-md rounded-[8px] p-3 bg-white">
+        <View className="gap-3">
 
-    {/* Header Section */}
-    <View className="flex flex-row justify-between items-center px-1">
-      <View className="flex-row gap-2 items-center">
-        <Text className="text-[14px] text-black font-medium">{formattedDate}</Text>
-        <Text className="text-[14px] text-black">-</Text>
-        <Text className="text-[14px] text-black font-medium">{formattedTime}</Text>
-      </View>
-      <View className="border border-gray-300 rounded-lg px-3 py-1 bg-gray-100">
-        <Text className="text-[13px] font-medium text-gray-700">{carName}</Text>
-      </View>
-    </View>
-    <View className="h-[2rem] w-full bg-black"></View>
-
-    {/* Location Info */}
-    <View className="px-1 flex-row justify-between items-center">
-      <Text className="text-[16px] font-semibold text-black">{pickupLocation}</Text>
-      <View className="border border-gray-300 rounded-full px-3 py-1 bg-gray-100">
-        <Text className="text-[12px] text-gray-700">Round</Text>
-      </View>
-      <Text className="text-[16px] font-semibold text-black">{dropoffLocation}</Text>
-    </View>
-
-    {/* Fare & Commission */}
-    <View className="gap-2 px-1">
-      <View className="flex flex-row justify-between items-center bg-gray-100 rounded-md px-3 py-2">
-        <Text className="text-[14px] font-bold text-black">Fare</Text>
-        <Text className="text-[14px] text-black">{formatCurrency(fare)}</Text>
-      </View>
-
-      <View className="flex flex-row justify-between items-center bg-gray-100 rounded-md px-3 py-2">
-        <Text className="text-[14px] font-bold text-black">Commission</Text>
-        <Text className="text-[14px] text-black">{formatCurrency(commission)}</Text>
-      </View>
-    </View>
-
-    {/* Additional Info */}
-    {additional && (
-      <View className="mt-2 px-1">
-        {/* <View className="border-t border-gray-300 my-2" /> */}
-        <Text className="text-[14px] font-semibold text-black mb-1">Additional</Text>
-        <Text className="text-[13px] text-gray-700">{additional}</Text>
-      </View>
-    )}
-  </View>
-
-  {/* Bottom Section: Profile + Actions */}
-  <View className="flex flex-row items-center justify-between mt-4 px-1">
-    {/* Profile Circle */}
-     <View className="flex-row items-center gap-4">
-          <View className="bg-black rounded-full w-[3rem] h-[3rem]" />
-          <View className="flex gap-1">
-            <Text className="font-medium">Hardik</Text>
-            <StarRating rating={5} />
+          {/* Header Section */}
+          <View className="flex flex-row justify-between items-center px-1">
+            <View className="flex-row gap-2 items-center">
+              <Text className="text-[14px] text-black font-medium">{formattedDate}</Text>
+              <Text className="text-[14px] text-black">-</Text>
+              <Text className="text-[14px] text-black font-medium">{formattedTime}</Text>
+            </View>
+            <View className="border border-gray-300 rounded-lg px-3 py-1 bg-gray-100">
+              <Text className="text-[13px] font-medium text-gray-700">{carType}</Text>
+            </View>
           </View>
+          <View className="h-[2rem] w-full bg-black"></View>
+
+          {/* Location Info */}
+          <View className="px-1 flex-row justify-between items-center">
+            <Text className="text-[16px] font-semibold text-black">{pickupLocation}</Text>
+            <View className="border border-gray-300 rounded-full px-3 py-1 bg-gray-100">
+              <Text className="text-[12px] text-gray-700">{tripType}</Text>
+            </View>
+            <Text className="text-[16px] font-semibold text-black">{dropoffLocation}</Text>
+          </View>
+
+          {/* Fare & Commission */}
+          <View className="gap-2 px-1">
+            <View className="flex flex-row justify-between items-center bg-gray-100 rounded-md px-3 py-2">
+              <Text className="text-[14px] font-bold text-black">Fare</Text>
+              <Text className="text-[14px] text-black">{formatCurrency(fare)}</Text>
+            </View>
+
+            <View className="flex flex-row justify-between items-center bg-gray-100 rounded-md px-3 py-2">
+              <Text className="text-[14px] font-bold text-black">Commission</Text>
+              <Text className="text-[14px] text-black">{formatCurrency(commission)}</Text>
+            </View>
+          </View>
+
+          {/* Additional Info */}
+          {additional && (
+            <View className="mt-2 px-1">
+              {/* <View className="border-t border-gray-300 my-2" /> */}
+              <Text className="text-[14px] font-semibold text-black mb-1">Additional</Text>
+              <Text className="text-[13px] text-gray-700">{additional}</Text>
+            </View>
+          )}
         </View>
 
-    {/* Action Buttons */}
-    <View className="flex flex-row gap-3">
-      <TouchableOpacity className="bg-white px-4 py-2 border border-black rounded-full">
-        <Text className="text-black font-semibold text-[14px]">Call</Text>
-      </TouchableOpacity>
-      <TouchableOpacity className="bg-black px-4 py-2 rounded-full">
-        <Text className="text-white font-semibold text-[14px]">Chat</Text>
-      </TouchableOpacity>
-    </View>
-  </View>
-</View>
+        {/* Bottom Section: Profile + Actions */}
+        <View className="flex flex-row items-center justify-between mt-4 px-1">
+          {/* Profile Circle */}
+          <View className="flex-row items-center gap-4">
+            <View className="bg-black rounded-full w-[3rem] h-[3rem]" />
+            <View className="flex gap-1">
+              <Text className="font-medium">Hardik</Text>
+              <StarRating rating={5} />
+            </View>
+          </View>
+
+          {/* Action Buttons */}
+          <View className="flex flex-row gap-3">
+            <TouchableOpacity className="bg-white px-4 py-2 border border-black rounded-full">
+              <Text className="text-black font-semibold text-[14px]">Call</Text>
+            </TouchableOpacity>
+            <TouchableOpacity className="bg-black px-4 py-2 rounded-full">
+              <Text className="text-white font-semibold text-[14px]">Chat</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
 
 
     </>
